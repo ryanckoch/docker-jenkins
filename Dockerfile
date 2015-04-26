@@ -1,4 +1,4 @@
-FROM java:openjdk-7u65-jdk
+FROM ryanckoch/docker-java-openjdk7-jre
 
 RUN apt-get update && apt-get install -y wget git curl zip && rm -rf /var/lib/apt/lists/*
 
