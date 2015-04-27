@@ -1,5 +1,7 @@
 FROM ryanckoch/docker-java-openjdk7-jre
 
+USER root
+
 RUN apt-get update && apt-get install -y wget git curl zip && rm -rf /var/lib/apt/lists/*
 
 ENV JENKINS_HOME /var/jenkins_home
@@ -28,7 +30,7 @@ ENV JENKINS_VERSION 1.596.2
 RUN curl -L http://mirrors.jenkins-ci.org/war-stable/$JENKINS_VERSION/jenkins.war -o /usr/share/jenkins/jenkins.war
 
 ENV JENKINS_UC https://updates.jenkins-ci.org
-RUN chown -R jenkins "$JENKINS_HOME" /usr/share/jenkins/ref
+RUN chown -R jenkins:jenkins "$JENKINS_HOME" /usr/share/jenkins/ref
 
 # for main web interface:
 EXPOSE 8080
@@ -36,10 +38,14 @@ EXPOSE 8080
 # will be used by attached slave agents:
 EXPOSE 50000
 
+COPY jenkins.sh /usr/local/bin/jenkins.sh
+COPY plugins.sh /usr/local/bin/plugins.sh
+
+RUN chmod +x /usr/local/bin/jenkins.sh && \
+	chown jenkins:jenkins /usr/local/bin/jenkins.sh && \	
+	chmod +x /usr/local/bin/plugins.sh && \
+	chown jenkins:jenkins /usr/local/bin/plugins.sh 
+
 USER jenkins
 
-COPY jenkins.sh /usr/local/bin/jenkins.sh
-ENTRYPOINT ["/usr/local/bin/jenkins.sh"]
-
-# from a derived Dockerfile, can use `RUN plugin.sh active.txt` to setup /usr/share/jenkins/ref/plugins from a support bundle
-COPY plugins.sh /usr/local/bin/plugins.sh
+CMD ["/usr/local/bin/jenkins.sh"]
