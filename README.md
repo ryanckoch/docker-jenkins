@@ -1,4 +1,4 @@
-# Official Jenkins Docker image
+# Jenkins Docker image
 
 The Jenkins Continuous Integration and Delivery server.
 
@@ -12,14 +12,14 @@ http://jenkins-ci.org/
 # Usage
 
 ```
-docker run -p 8080:8080 jenkins
+docker run -p 8080:8080 ryanckoch/docker-jenkins
 ```
 
 This will store the workspace in /var/jenkins_home. All Jenkins data lives in there - including plugins and configuration.
 You will probably want to make that a persistent volume (recommended):
 
 ```
-docker run -p 8080:8080 -v /your/home:/var/jenkins_home jenkins
+docker run -p 8080:8080 -v /your/home:/var/jenkins_home ryanckoch/docker-jenkins
 ```
 
 This will store the jenkins data in /your/home on the host.
@@ -29,7 +29,7 @@ Ensure that /your/home is accessible by the jenkins user in container (jenkins u
 You can also use a volume container:
 
 ```
-docker run --name myjenkins -p 8080:8080 -v /var/jenkins_home jenkins
+docker run --name myjenkins -p 8080:8080 -v /var/jenkins_home ryanckoch/docker-jenkins
 ```
 
 Then myjenkins container has the volume (please do read about docker volume handling to find out more).
@@ -56,7 +56,7 @@ You might need to customize the JVM running Jenkins, typically to pass system pr
 variable for this purpose :
 
 ```
-docker run --name myjenkins -p 8080:8080 --env JAVA_OPTS=-Dhudson.footerURL=http://mycompany.com jenkins
+docker run --name myjenkins -p 8080:8080 --env JAVA_OPTS=-Dhudson.footerURL=http://mycompany.com ryanckoch/docker-jenkins
 ```
 
 # Passing Jenkins launcher parameters
@@ -72,7 +72,7 @@ define a derived jenkins image based on the official one with some customized se
 to force use of HTTPS with a certificate included in the image
 
 ```
-FROM jenkins:1.565.3
+FROM ryanckoch/docker-jenkins
 
 COPY https.pem /var/lib/jenkins/cert
 COPY https.key /var/lib/jenkins/pk
@@ -85,7 +85,7 @@ EXPOSE 8083
 You can run your container as root - and install via apt-get, install as part of build steps via jenkins tool installers, or you can create your own Dockerfile to customise, for example: 
 
 ```
-FROM jenkins
+FROM ryanckoch/docker-jenkins
 # if we want to install via apt
 USER root
 RUN apt-get install -y ruby make more-thing-here
@@ -97,7 +97,7 @@ For this purpose, use `/usr/share/jenkins/ref` as a place to define the default 
 wish the target installation to look like :
 
 ```
-FROM jenkins
+FROM ryanckoch/docker-jenkins
 COPY plugins /usr/share/jenkins/ref/plugins
 COPY custom.groovy /usr/share/jenkins/ref/init.groovy.d/custom.groovy
 ```
@@ -113,7 +113,7 @@ anotherPluginID:version
 ```
 And in derived Dockerfile just invoke the utility plugin.sh script
 ```
-FROM jenkins
+FROM ryanckoch/docker-jenkins
 COPY plugins.txt /usr/share/jenkins/plugins.txt
 RUN /usr/local/bin/plugins.sh /usr/share/jenkins/plugins.txt
 ```
